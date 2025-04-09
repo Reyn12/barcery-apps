@@ -41,16 +41,13 @@ export function ScanScreen() {
 
   useEffect(() => {
     if (cameraReady && !flashInitialized) {
-      console.log("Menginisialisasi flash...");
       
-      // Nyalakan flash sebentar
       setFlashOn(true);
-      
-      // Matikan flash setelah 500ms
+
+      // Matiin flash after 500ms
       const timer = setTimeout(() => {
         setFlashOn(false);
         setFlashInitialized(true);
-        console.log("Flash berhasil diinisialisasi");
       }, 500);
       
       return () => clearTimeout(timer);
@@ -60,31 +57,31 @@ export function ScanScreen() {
   const handleBarcodeScanned = ({ type, data }: { type: string; data: string }) => {
     setScanned(true);
     setScannedBarcode(data);
-    setIsScanning(true); // Set status scanning jadi true
-    
-    // Cari produk berdasarkan barcode
+    setIsScanning(true);
+
+    // Cari produk dari barcode
     const product = findProductByBarcode(data);
     
-    // Tambahkan jeda 1 detik agar tulisan "Scanning..." terlihat
+    // Tambahkan jeda 1 detik biar tulisan "Scanning..." keliatan
     setTimeout(() => {
       if (product) {
-        // Produk ditemukan, tampilkan komponen ProductFound
+        // Produk ditemukan
         setFoundProduct(product);
-        setFrameColor(Colors.success[50]); // Set warna frame jadi hijau
-        // Tidak perlu set timeout karena user akan klik tombol untuk scan lagi
+        setFrameColor(Colors.success[50]); 
       } else {
-        // Produk tidak ditemukan, tampilkan modal
+        // Produk tidak ditemukan
         setShowNotFoundModal(true);
-        setFrameColor(Colors.danger[50]); // Set warna frame jadi merah
+        setFrameColor(Colors.danger[50]);
       }
-    }, 1000); // Jeda 1 detik
+    }, 1000); 
   };
 
   const handleCloseNotFoundModal = () => {
     setShowNotFoundModal(false);
-    setFrameColor('white'); // Reset warna frame ke putih
-    setIsScanning(false); // Reset status scanning
-    // Aktifkan scanner lagi setelah modal ditutup
+    setFrameColor('white');
+    setIsScanning(false);
+
+    // Aktifkan scanner lagi abis modal ditutup
     setTimeout(() => setScanned(false), 500);
   };
 
@@ -92,8 +89,8 @@ export function ScanScreen() {
     // Di sini bisa navigasi ke halaman detail produk atau lakukan aksi lain
     // Untuk sementara kita hanya reset scanner
     setFoundProduct(null);
-    setFrameColor('white'); // Reset warna frame ke putih
-    setIsScanning(false); // Reset status scanning
+    setFrameColor('white');
+    setIsScanning(false);
     setTimeout(() => setScanned(false), 500);
   };
 
@@ -101,23 +98,16 @@ export function ScanScreen() {
     try {
       // Jika kamera masih dalam proses inisialisasi, jangan lakukan apa-apa
       if (isInitializing) {
-        console.log("Kamera masih dalam proses inisialisasi, tunggu sebentar...");
         return;
       }
       
       // Jika flash belum diinisialisasi, jangan lakukan apa-apa
       if (!flashInitialized) {
-        console.log("Flash belum diinisialisasi, tunggu sebentar...");
         return;
       }
       
-      console.log("Status flash sebelum:", flashOn);
-      console.log("Status kamera ready:", cameraReady);
-      
       // Pastikan kamera sudah siap sebelum mengubah flash
       if (!cameraReady) {
-        console.log("Kamera belum siap, menunggu...");
-        // Jika kamera belum siap, jangan ubah status flash dulu
         return;
       }
       
@@ -125,10 +115,8 @@ export function ScanScreen() {
       setTimeout(() => {
         const newFlashMode = !flashOn;
         setFlashOn(newFlashMode);
-        console.log("Mengubah flash ke:", newFlashMode ? "on" : "off");
       }, 100);
     } catch (error) {
-      console.error("Error saat mengaktifkan flash:", error);
       alert('Gagal mengaktifkan flash: ' + error);
     }
   };
@@ -153,7 +141,6 @@ export function ScanScreen() {
           }}
           enableTorch={flashOn}
           onCameraReady={() => {
-            console.log("Kamera siap!");
             setCameraReady(true);
           }}
           />
