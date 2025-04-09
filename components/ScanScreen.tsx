@@ -87,10 +87,15 @@ export function ScanScreen() {
 
   const handleProductPress = () => {
     // Di sini bisa navigasi ke halaman detail produk atau lakukan aksi lain
-    // Untuk sementara kita hanya reset scanner
+    console.log('Navigasi ke detail produk:', foundProduct?.name);
+    // Tambahkan kode navigasi di sini jika diperlukan
+  };
+
+  const handleResetScanner = () => {
+    // Reset scanner untuk scan baru
     setFoundProduct(null);
-    setFrameColor('white');
-    setIsScanning(false);
+    setFrameColor('white'); // Reset warna frame ke putih
+    setIsScanning(false); // Reset status scanning
     setTimeout(() => setScanned(false), 500);
   };
 
@@ -201,11 +206,12 @@ export function ScanScreen() {
           onClose={handleCloseNotFoundModal} 
         />
 
-        {/* Tampilkan ProductFound jika produk ditemukan */}
+        {/* Tampilkan komponen ProductFound jika produk ditemukan */}
         {foundProduct && (
           <ProductFound 
             product={foundProduct} 
-            onPress={handleProductPress} 
+            onPress={handleProductPress}
+            onReset={handleResetScanner}
           />
         )}
       </View>

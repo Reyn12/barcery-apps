@@ -6,12 +6,20 @@ import { Product } from '../types/product'
 interface ProductFoundProps {
   product: Product;
   onPress: () => void;
+  onReset?: () => void;
 }
 
-export function ProductFound({ product, onPress }: ProductFoundProps) {
+export function ProductFound({ product, onPress, onReset }: ProductFoundProps) {
+  const handleProductPress = () => {
+    onPress();
+    if (onReset) {
+      onReset();
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.card} onPress={onPress}>
+      <TouchableOpacity style={styles.card} onPress={handleProductPress}>
         <View style={styles.imageContainer}>
           {product.imageUrl ? (
             <Image source={{ uri: product.imageUrl }} style={styles.image} />
