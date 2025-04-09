@@ -10,6 +10,10 @@ export const Colors = {
   tertiary: '#ADBC9F',
   Neutral: '#FBFADA',
 
+  gray: {
+    100: '#666666', 
+  },
+
   danger: {
     100: '#160404', 
     90: '#2C0808',

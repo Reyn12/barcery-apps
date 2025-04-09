@@ -14,7 +14,7 @@ export const dummyProducts: Product[] = [
   {
     id: '1',
     name: 'Bisquit Hatari 250 gr',
-    barcode: '073935942400', // debug tambah 0
+    barcode: '073935942400', // debug tambah atau kurangi 0 (073935942400)
     price: 15000,
     description: 'Biskuit Hatari kemasan ekonomis',
     category: 'Makanan',
@@ -23,7 +23,7 @@ export const dummyProducts: Product[] = [
   {
     id: '2',
     name: 'Aqua Botol Sanqua 1.5L',
-    barcode: '8994287316034',
+    barcode: '89942873160340',
     price: 5000,
     description: 'Air mineral dalam kemasan botol',
     category: 'Minuman',

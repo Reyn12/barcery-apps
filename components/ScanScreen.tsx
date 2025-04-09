@@ -7,17 +7,20 @@ import { useRef } from 'react'
 import { findProductByBarcode, Product } from '../types/product';
 import { ProductNotFound } from './ProductNotFound';
 import { ProductFound } from './ProductFound';
+import { Colors } from '../constants/Colors';
 
 export function ScanScreen() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [scanned, setScanned] = useState(false);
-  const [flashOn, setFlashOn] = useState(false);
-  const [cameraReady, setCameraReady] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
+  const [scanned, setScanned] = useState(false);
+  const [cameraReady, setCameraReady] = useState(false);
+  const [flashOn, setFlashOn] = useState(false);
   const [flashInitialized, setFlashInitialized] = useState(false);
   const [showNotFoundModal, setShowNotFoundModal] = useState(false);
   const [scannedBarcode, setScannedBarcode] = useState('');
   const [foundProduct, setFoundProduct] = useState<Product | null>(null);
+  const [frameColor, setFrameColor] = useState('white'); // Default warna frame putih
+  const [isScanning, setIsScanning] = useState(false); // State untuk status scanning
   const cameraRef = useRef<CameraView>(null);
 
   useEffect(() => {
@@ -57,22 +60,30 @@ export function ScanScreen() {
   const handleBarcodeScanned = ({ type, data }: { type: string; data: string }) => {
     setScanned(true);
     setScannedBarcode(data);
+    setIsScanning(true); // Set status scanning jadi true
     
     // Cari produk berdasarkan barcode
     const product = findProductByBarcode(data);
     
-    if (product) {
-      // Produk ditemukan, tampilkan komponen ProductFound
-      setFoundProduct(product);
-      // Tidak perlu set timeout karena user akan klik tombol untuk scan lagi
-    } else {
-      // Produk tidak ditemukan, tampilkan modal
-      setShowNotFoundModal(true);
-    }
+    // Tambahkan jeda 1 detik agar tulisan "Scanning..." terlihat
+    setTimeout(() => {
+      if (product) {
+        // Produk ditemukan, tampilkan komponen ProductFound
+        setFoundProduct(product);
+        setFrameColor(Colors.success[50]); // Set warna frame jadi hijau
+        // Tidak perlu set timeout karena user akan klik tombol untuk scan lagi
+      } else {
+        // Produk tidak ditemukan, tampilkan modal
+        setShowNotFoundModal(true);
+        setFrameColor(Colors.danger[50]); // Set warna frame jadi merah
+      }
+    }, 1000); // Jeda 1 detik
   };
 
   const handleCloseNotFoundModal = () => {
     setShowNotFoundModal(false);
+    setFrameColor('white'); // Reset warna frame ke putih
+    setIsScanning(false); // Reset status scanning
     // Aktifkan scanner lagi setelah modal ditutup
     setTimeout(() => setScanned(false), 500);
   };
@@ -81,15 +92,10 @@ export function ScanScreen() {
     // Di sini bisa navigasi ke halaman detail produk atau lakukan aksi lain
     // Untuk sementara kita hanya reset scanner
     setFoundProduct(null);
+    setFrameColor('white'); // Reset warna frame ke putih
+    setIsScanning(false); // Reset status scanning
     setTimeout(() => setScanned(false), 500);
   };
-
-  if (hasPermission === null) {
-    return <View style={styles.container}><Text style={{ color: 'white' }}>Meminta izin kamera...</Text></View>;
-  }
-  if (hasPermission === false) {
-    return <View style={styles.container}><Text style={{ color: 'white' }}>Tidak ada akses ke kamera</Text></View>;
-  }
 
   const nyalainFlash = async () => {
     try {
@@ -127,6 +133,13 @@ export function ScanScreen() {
     }
   };
 
+  if (hasPermission === null) {
+    return <View style={styles.container}><Text style={{ color: 'white' }}>Meminta izin kamera...</Text></View>;
+  }
+  if (hasPermission === false) {
+    return <View style={styles.container}><Text style={{ color: 'white' }}>Tidak ada akses ke kamera</Text></View>;
+  }
+
   return (
     <>
       <StatusBar style="light" />
@@ -159,21 +172,28 @@ export function ScanScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Text instruksi */}
-          <View style={styles.instructionContainer}>
-            <Text style={styles.instructionText}>Arahkan kamera ke barcode</Text>
-          </View>
+          {/* Text instruksi - tampilkan hanya jika tidak ada modal/product found */}
+          {!showNotFoundModal && !foundProduct ? (
+            <View style={styles.instructionContainer}>
+              <Text style={styles.instructionText}>
+                {isScanning ? "Scanning..." : "Arahkan kamera ke barcode"}
+              </Text>
+            </View>
+          ) : (
+            // Placeholder kosong untuk menjaga posisi frame tetap di tengah
+            <View style={[styles.instructionContainer, { marginBottom: 40 }]} />
+          )}
 
           {/* Frame scanner */}
           <View style={styles.scannerFrame}>
             {/* Garis sudut kiri atas */}
-            <View style={[styles.corner, styles.topLeft]} />
+            <View style={[styles.corner, styles.topLeft, { borderColor: frameColor }]} />
             {/* Garis sudut kanan atas */}
-            <View style={[styles.corner, styles.topRight]} />
+            <View style={[styles.corner, styles.topRight, { borderColor: frameColor }]} />
             {/* Garis sudut kiri bawah */}
-            <View style={[styles.corner, styles.bottomLeft]} />
+            <View style={[styles.corner, styles.bottomLeft, { borderColor: frameColor }]} />
             {/* Garis sudut kanan bawah */}
-            <View style={[styles.corner, styles.bottomRight]} />
+            <View style={[styles.corner, styles.bottomRight, { borderColor: frameColor }]} />
           </View>
 
           {/* Tombol kamera di bawah */}
@@ -230,11 +250,11 @@ const styles = StyleSheet.create({
   },
   instructionContainer: {
     alignItems: 'center',
-    marginTop: 80,
+    marginTop: 70,
   },
   instructionText: {
-    color: 'white',
-    backgroundColor: 'rgba(144, 238, 144, 0.8)',
+    color: Colors.neutral[90],
+    backgroundColor: Colors.success[30],
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 20,
@@ -252,7 +272,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 60,
     height: 60,
-    borderColor: 'white',
     borderWidth: 6,
     borderRadius: 20,
   },

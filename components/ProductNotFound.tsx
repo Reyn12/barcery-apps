@@ -1,6 +1,8 @@
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native'
 import React from 'react'
 import { X } from 'lucide-react-native'
+import { Colors } from '../constants/Colors'
+
 
 interface ProductNotFoundProps {
   visible: boolean;
@@ -18,9 +20,11 @@ export function ProductNotFound({ visible, barcode, onClose }: ProductNotFoundPr
     >
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          {/* Icon X dalam lingkaran merah */}
-          <View style={styles.iconContainer}>
-            <X size={32} color="white" />
+          {/* Icon X dalam persegi dengan lingkaran merah di dalam */}
+          <View style={styles.iconSquare}>
+            <View style={styles.iconContainer}>
+              <X size={24} color="white" />
+            </View>
           </View>
           
           {/* Judul */}
@@ -66,24 +70,32 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  iconContainer: {
+  iconSquare: {
     width: 64,
     height: 64,
-    borderRadius: 32,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: Colors.danger[20],
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 24,
+  },
+  iconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.danger[50],
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#333',
+    marginBottom: 25,
+    color: '#17171F',
   },
   description: {
     fontSize: 14,
-    color: '#666',
+    color: Colors.gray[100],
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -94,7 +106,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   button: {
-    backgroundColor: '#0D7F3F',
+    backgroundColor: Colors.primary,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
