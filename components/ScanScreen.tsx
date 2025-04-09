@@ -164,7 +164,7 @@ export function ScanScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Text instruksi - tampilkan hanya jika tidak ada modal/product found */}
+          {/* Text instruksi - tampilin klo gaada ada modal/product found */}
           {!showNotFoundModal && !foundProduct ? (
             <View style={styles.instructionContainer}>
               <Text style={styles.instructionText}>
@@ -172,19 +172,15 @@ export function ScanScreen() {
               </Text>
             </View>
           ) : (
-            // Placeholder kosong untuk menjaga posisi frame tetap di tengah
+            // Placeholder kosong 
             <View style={[styles.instructionContainer, { marginBottom: 40 }]} />
           )}
 
           {/* Frame scanner */}
           <View style={styles.scannerFrame}>
-            {/* Garis sudut kiri atas */}
             <View style={[styles.corner, styles.topLeft, { borderColor: frameColor }]} />
-            {/* Garis sudut kanan atas */}
             <View style={[styles.corner, styles.topRight, { borderColor: frameColor }]} />
-            {/* Garis sudut kiri bawah */}
             <View style={[styles.corner, styles.bottomLeft, { borderColor: frameColor }]} />
-            {/* Garis sudut kanan bawah */}
             <View style={[styles.corner, styles.bottomRight, { borderColor: frameColor }]} />
           </View>
 
@@ -205,8 +201,8 @@ export function ScanScreen() {
           barcode={scannedBarcode} 
           onClose={handleCloseNotFoundModal} 
         />
-
-        {/* Tampilkan komponen ProductFound jika produk ditemukan */}
+        
+        {/* Modal Produk Ditemukan */}
         {foundProduct && (
           <ProductFound 
             product={foundProduct} 
