@@ -4,6 +4,9 @@ import { Flashlight, Settings, Camera as CameraIcon } from 'lucide-react-native'
 import { StatusBar } from "expo-status-bar"
 import { CameraView, Camera } from 'expo-camera'
 import { useRef } from 'react'
+import { findProductByBarcode, Product } from '../types/product';
+import { ProductNotFound } from './ProductNotFound';
+import { ProductFound } from './ProductFound';
 
 export function ScanScreen() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -12,6 +15,9 @@ export function ScanScreen() {
   const [cameraReady, setCameraReady] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
   const [flashInitialized, setFlashInitialized] = useState(false);
+  const [showNotFoundModal, setShowNotFoundModal] = useState(false);
+  const [scannedBarcode, setScannedBarcode] = useState('');
+  const [foundProduct, setFoundProduct] = useState<Product | null>(null);
   const cameraRef = useRef<CameraView>(null);
 
   useEffect(() => {
@@ -50,8 +56,32 @@ export function ScanScreen() {
 
   const handleBarcodeScanned = ({ type, data }: { type: string; data: string }) => {
     setScanned(true);
-    // Untuk sementara kita hanya tampilkan alert saja
-    alert(`Barcode dengan tipe ${type} dan data ${data} telah dipindai!`);
+    setScannedBarcode(data);
+    
+    // Cari produk berdasarkan barcode
+    const product = findProductByBarcode(data);
+    
+    if (product) {
+      // Produk ditemukan, tampilkan komponen ProductFound
+      setFoundProduct(product);
+      // Tidak perlu set timeout karena user akan klik tombol untuk scan lagi
+    } else {
+      // Produk tidak ditemukan, tampilkan modal
+      setShowNotFoundModal(true);
+    }
+  };
+
+  const handleCloseNotFoundModal = () => {
+    setShowNotFoundModal(false);
+    // Aktifkan scanner lagi setelah modal ditutup
+    setTimeout(() => setScanned(false), 500);
+  };
+
+  const handleProductPress = () => {
+    // Di sini bisa navigasi ke halaman detail produk atau lakukan aksi lain
+    // Untuk sementara kita hanya reset scanner
+    setFoundProduct(null);
+    setTimeout(() => setScanned(false), 500);
   };
 
   if (hasPermission === null) {
@@ -156,6 +186,21 @@ export function ScanScreen() {
             </TouchableOpacity>
           </View>
         </SafeAreaView>
+
+        {/* Modal Produk Tidak Ditemukan */}
+        <ProductNotFound 
+          visible={showNotFoundModal} 
+          barcode={scannedBarcode} 
+          onClose={handleCloseNotFoundModal} 
+        />
+
+        {/* Tampilkan ProductFound jika produk ditemukan */}
+        {foundProduct && (
+          <ProductFound 
+            product={foundProduct} 
+            onPress={handleProductPress} 
+          />
+        )}
       </View>
     </>
   )
@@ -173,7 +218,6 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 40,
     padding: 16,
   },
   iconButton: {
