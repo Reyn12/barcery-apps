@@ -1,0 +1,42 @@
+[
+  {
+    "id": "1",
+    "name": "Bisquit Hatari 250 gr",
+    "barcode": "073935942400",
+    "price": 15000,
+    "description": "Biskuit Hatari kemasan ekonomis",
+    "category": "Makanan",
+    "stock": 50,
+    "variation": "Original",
+    "affiliations": ["israel"],
+    "nutritionInfo": {
+      "energiTotal": 120,
+      "energiDariLemak": 60,
+      "lemakTotal": 7,
+      "kolesterol": 20,
+      "lemakJenuh": 4,
+      "protein": 6,
+      "karbohidratTotal": 10,
+      "gulaTotal": 10,
+      "sukrosa": 0,
+      "laktosa": 10,
+      "garam": 90,
+      "karboPersenAKG": 3,
+      "proteinPersenAKG": 9,
+      "lemakPersenAKG": 10,
+      "natriumPersenAKG": 6
+    },
+    "composition": ["Tepung terigu", "Gula", "Minyak nabati", "Garam", "Perisa buatan"]
+  },
+  {
+    "id": "2",
+    "name": "Aqua Botol Sanqua 1.5L",
+    "barcode": "89942873160340",
+    "price": 5000,
+    "description": "Air mineral dalam kemasan botol",
+    "category": "Minuman",
+    "stock": 100,
+    "affiliations": ["lgbt", "israel"],
+    "composition": ["Air mineral"]
+  }
+]

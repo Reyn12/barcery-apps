@@ -1,3 +1,29 @@
+export interface NutritionInfo {
+  energiTotal: number; // dalam kkal
+  energiDariLemak: number; // dalam kkal
+  lemakTotal: number; // dalam gram
+  kolesterol: number; // dalam mg
+  lemakJenuh: number; // dalam gram
+  protein: number; // dalam gram
+  karbohidratTotal: number; // dalam gram
+  gulaTotal: number; // dalam gram
+  sukrosa: number; // dalam gram
+  laktosa: number; // dalam gram
+  garam: number; // dalam mg (natrium)
+  
+  // Persentase AKG
+  karboPersenAKG: number;
+  proteinPersenAKG: number;
+  lemakPersenAKG: number;
+  natriumPersenAKG: number;
+}
+
+export enum Affiliation {
+  ISRAEL = 'israel',
+  LGBT = 'lgbt',
+  NONE = 'none'
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -7,31 +33,10 @@ export interface Product {
   imageUrl?: string;
   category?: string;
   stock?: number;
+  
+  // Field baru
+  variation?: string;
+  affiliations?: string[]; // Bisa kosong, atau berisi satu atau dua nilai (misalnya ["israel", "lgbt"])
+  nutritionInfo?: NutritionInfo;
+  composition?: string[]; // Array dari bahan-bahan
 }
-
-// Data dummy untuk testing fitur scan barang
-export const dummyProducts: Product[] = [
-  {
-    id: '1',
-    name: 'Bisquit Hatari 250 gr',
-    barcode: '073935942400', // debug tambah atau kurangi 0 (073935942400)
-    price: 15000,
-    description: 'Biskuit Hatari kemasan ekonomis',
-    category: 'Makanan',
-    stock: 50
-  },
-  {
-    id: '2',
-    name: 'Aqua Botol Sanqua 1.5L',
-    barcode: '89942873160340',
-    price: 5000,
-    description: 'Air mineral dalam kemasan botol',
-    category: 'Minuman',
-    stock: 100
-  }
-];
-
-// Fungsi untuk mencari produk berdasarkan barcode
-export const findProductByBarcode = (barcode: string): Product | undefined => {
-  return dummyProducts.find(product => product.barcode === barcode);
-};

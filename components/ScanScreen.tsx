@@ -4,10 +4,16 @@ import { Flashlight, Settings, Camera as CameraIcon } from 'lucide-react-native'
 import { StatusBar } from "expo-status-bar"
 import { CameraView, Camera } from 'expo-camera'
 import { useRef } from 'react'
-import { findProductByBarcode, Product } from '../types/product';
+import { Product } from '../types/product';
+import productsData from '../data/products.json';
 import { ProductNotFound } from './ProductNotFound';
 import { ProductFound } from './ProductFound';
 import { Colors } from '../constants/Colors';
+
+// Fungsi untuk mencari produk berdasarkan barcode
+const findProductByBarcode = (barcode: string): Product | undefined => {
+  return productsData.find(product => product.barcode === barcode);
+};
 
 export function ScanScreen() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -19,8 +25,8 @@ export function ScanScreen() {
   const [showNotFoundModal, setShowNotFoundModal] = useState(false);
   const [scannedBarcode, setScannedBarcode] = useState('');
   const [foundProduct, setFoundProduct] = useState<Product | null>(null);
-  const [frameColor, setFrameColor] = useState('white'); // Default warna frame putih
-  const [isScanning, setIsScanning] = useState(false); // State untuk status scanning
+  const [frameColor, setFrameColor] = useState('white'); 
+  const [isScanning, setIsScanning] = useState(false); 
   const cameraRef = useRef<CameraView>(null);
 
   useEffect(() => {
@@ -164,7 +170,7 @@ export function ScanScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Text instruksi - tampilin klo gaada ada modal/product found */}
+          {/* Tampilin klo gaada ada modal/product found */}
           {!showNotFoundModal && !foundProduct ? (
             <View style={styles.instructionContainer}>
               <Text style={styles.instructionText}>
