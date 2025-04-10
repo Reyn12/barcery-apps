@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Dimensions } from 'react-native'
+import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
 import { Colors } from '../../constants/Colors'
 import { PieChart } from 'react-native-chart-kit'

@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
 import React from 'react'
 import { ChevronRight, ImageIcon } from 'lucide-react-native'
 import { Product } from '../types/product'
+import { router } from 'expo-router'
 
 interface ProductFoundProps {
   product: Product;
@@ -10,16 +11,14 @@ interface ProductFoundProps {
 }
 
 export function ProductFound({ product, onPress, onReset }: ProductFoundProps) {
-  const handleProductPress = () => {
-    onPress();
-    if (onReset) {
-      onReset();
-    }
+
+  const handleNavigateToDetail = () => {
+    router.push('/detail');
   };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.card} onPress={handleProductPress}>
+      <TouchableOpacity style={styles.card} onPress={handleNavigateToDetail}>
         <View style={styles.imageContainer}>
           {product.imageUrl ? (
             <Image source={{ uri: product.imageUrl }} style={styles.image} />

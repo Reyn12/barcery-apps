@@ -4,6 +4,9 @@ import { StatusBar } from "expo-status-bar";
 import { ArrowLeft, Weight, UtensilsCrossed } from "lucide-react-native";
 import { Colors } from '../constants/Colors'
 import { InformasiGizi } from "../components/detailProduk/InformasiGizi";
+import { KomposisiProduk } from "../components/detailProduk/KomposisiProduk";
+import { InformasiProdusen } from "../components/detailProduk/InformasiProdusen";
+import { Sertifikasi } from "@/components/detailProduk/Sertifikasi";
 
 export default function DetailProduk() {
   return (
@@ -52,6 +55,12 @@ export default function DetailProduk() {
           {/* Informasi Gizi */}
           <InformasiGizi />
           
+          {/* Komposisi Produk */}
+          <KomposisiProduk />
+          
+          {/* Informasi Produsen */}
+          <InformasiProdusen />
+          
           {/* Affiliations */}
           <View style={styles.affiliationSection}>
             <Text style={styles.sectionTitle}>Afiliasi</Text>
@@ -81,6 +90,9 @@ export default function DetailProduk() {
               </View>
             </View>
           </View>
+
+          {/* Sertifikasi */}
+          <Sertifikasi />
         </View>
       </ScrollView>
     </View>

@@ -9,14 +9,14 @@ import DetailProduk from "./detail";
 export default function Index() {
   const [showWelcome, setShowWelcome] = useState(true);
 
-  // if (showWelcome) {
-  //   return <WelcomeScreen onMulaiPress={() => setShowWelcome(false)} />;
-  // }
+  if (showWelcome) {
+    return <WelcomeScreen onMulaiPress={() => setShowWelcome(false)} />;
+  }
 
   return (
     <>
       <StatusBar style="dark" />
-      {/* <ScanScreen /> */}
+      <ScanScreen />
       <DetailProduk />
     </>
   );
