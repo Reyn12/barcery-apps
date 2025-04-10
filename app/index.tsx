@@ -3,7 +3,6 @@ import { View, Text, StyleSheet } from "react-native";
 import { WelcomeScreen } from "../components/WelcomeScreen";
 import { ScanScreen } from "../components/ScanScreen";
 import { StatusBar } from "expo-status-bar";
-import DetailProduk from "./detail";
 
 
 export default function Index() {
@@ -17,7 +16,6 @@ export default function Index() {
     <>
       <StatusBar style="dark" />
       <ScanScreen />
-      <DetailProduk />
     </>
   );
 }

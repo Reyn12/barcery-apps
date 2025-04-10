@@ -9,6 +9,7 @@ import productsData from '../data/products.json';
 import { ProductNotFound } from './ProductNotFound';
 import { ProductFound } from './ProductFound';
 import { Colors } from '../constants/Colors';
+import { useFocusEffect } from 'expo-router';
 
 // Fungsi untuk mencari produk berdasarkan barcode
 const findProductByBarcode = (barcode: string): Product | undefined => {
@@ -26,7 +27,8 @@ export function ScanScreen() {
   const [scannedBarcode, setScannedBarcode] = useState('');
   const [foundProduct, setFoundProduct] = useState<Product | null>(null);
   const [frameColor, setFrameColor] = useState('white'); 
-  const [isScanning, setIsScanning] = useState(false); 
+  const [isScanning, setIsScanning] = useState(false);
+  const [isScreenFocused, setIsScreenFocused] = useState(false);
   const cameraRef = useRef<CameraView>(null);
 
   useEffect(() => {
@@ -60,7 +62,40 @@ export function ScanScreen() {
     }
   }, [cameraReady, flashInitialized]);
 
-  const handleBarcodeScanned = ({ type, data }: { type: string; data: string }) => {
+  // Aktifkan scanner kembali saat kembali ke layar ini
+  useFocusEffect(
+    React.useCallback(() => {
+      // Saat layar mendapatkan fokus (user kembali ke layar ini)
+      console.log('ScanScreen mendapatkan fokus');
+      
+      // Set flag bahwa layar baru saja mendapatkan fokus
+      setIsScreenFocused(true);
+      
+      // Hanya aktifkan scanner jika tidak ada produk yang ditemukan dan modal not found tidak tampil
+      if (!foundProduct && !showNotFoundModal) {
+        console.log('Mengaktifkan scanner kembali...');
+        // Pastikan scanner diaktifkan
+        setTimeout(() => {
+          setScanned(false);
+        }, 500);
+      }
+      
+      return () => {
+        // Saat layar kehilangan fokus, reset flag
+        setIsScreenFocused(false);
+      };
+    }, [foundProduct, showNotFoundModal])
+  );
+
+  const handleBarcodeScanned = ({ data }: { data: string }) => {
+    // Jika layar baru saja mendapatkan fokus, abaikan scan pertama
+    // Ini mencegah scan yang tidak diinginkan saat kembali dari halaman detail
+    if (isScreenFocused) {
+      setIsScreenFocused(false);
+      return;
+    }
+    
+    // Nonaktifkan scanner untuk mencegah multiple scan
     setScanned(true);
     setScannedBarcode(data);
     setIsScanning(true);
@@ -91,10 +126,13 @@ export function ScanScreen() {
     setTimeout(() => setScanned(false), 500);
   };
 
-  const handleProductPress = () => {
-    // Di sini bisa navigasi ke halaman detail produk atau lakukan aksi lain
-    console.log('Navigasi ke detail produk:', foundProduct?.name);
-    // Tambahkan kode navigasi di sini jika diperlukan
+  // Reset untuk navigasi ke halaman detail
+  const resetForNavigation = () => {
+    // Reset state tapi jangan aktifkan scanner
+    setFoundProduct(null);
+    setFrameColor('white');
+    setIsScanning(false);
+    // Tetap biarkan scanned = true agar scanner tidak aktif
   };
 
   const handleResetScanner = () => {
@@ -212,8 +250,7 @@ export function ScanScreen() {
         {foundProduct && (
           <ProductFound 
             product={foundProduct} 
-            onPress={handleProductPress}
-            onReset={handleResetScanner}
+            onReset={resetForNavigation}
           />
         )}
       </View>

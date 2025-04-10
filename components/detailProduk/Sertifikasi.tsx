@@ -48,7 +48,7 @@ export function Sertifikasi() {
             style={styles.logo}
             resizeMode="contain"
           />
-          <Text style={styles.certName}>Sertifikasi Kemenperdag</Text>
+          <Text style={styles.certName}>Sertifikasi KMNPRDG</Text>
           <Text style={styles.certNumber}>00040021820903</Text>
           <TouchableOpacity style={styles.navButton}>
             <ChevronRight size={20} color={Colors.primary} />
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     paddingRight: 16,
   },
   certificateCard: {
-    width: 150,
+    width: 180,
     backgroundColor: 'white',
     borderRadius: 8,
     padding: 12,

@@ -237,7 +237,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.neutral[10],
     padding: 16,
     borderRadius: 12,
-    marginBottom: 20,
   },
   title: {
     fontSize: 18,
@@ -283,8 +282,8 @@ const styles = StyleSheet.create({
   },
   nutritionLabel: {
     fontSize: 14,
-    color: Colors.neutral[100],
-    fontWeight: '500',
+    color: '#17171F',
+    fontWeight: '700',
   },
   nutritionSubLabel: {
     fontSize: 14,
@@ -292,6 +291,6 @@ const styles = StyleSheet.create({
   },
   nutritionValue: {
     fontSize: 14,
-    color: Colors.neutral[100],
+    color: '#17171F',
   },
 })

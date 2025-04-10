@@ -1,27 +1,59 @@
 import { useState } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, RefreshControl } from "react-native";
 import { StatusBar } from "expo-status-bar";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { ArrowLeft, Weight, UtensilsCrossed } from "lucide-react-native";
 import { Colors } from '../constants/Colors'
 import { InformasiGizi } from "../components/detailProduk/InformasiGizi";
 import { KomposisiProduk } from "../components/detailProduk/KomposisiProduk";
 import { InformasiProdusen } from "../components/detailProduk/InformasiProdusen";
 import { Sertifikasi } from "@/components/detailProduk/Sertifikasi";
+import { Afiliation } from "../components/detailProduk/Afiliation";
+import { router } from "expo-router";
 
 export default function DetailProduk() {
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    
+    // Simulasi fetch data
+    setTimeout(() => {
+      // Di sini nanti bisa panggil API untuk refresh data produk
+      console.log('Refreshing data produk...');
+      setRefreshing(false);
+    }, 1000);
+  };
+
+  const handleGoBack = () => {
+    router.back();
+  };
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <StatusBar style="dark" />
       
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
+        <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
           <ArrowLeft size={24} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Detail Produk</Text>
       </View>
       
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[Colors.primary]}
+            tintColor={Colors.primary}
+            title="Memuat ulang..."
+            titleColor={Colors.neutral[70]}
+          />
+        }
+      >
         {/* Product Image */}
         <View style={styles.imageContainer}>
           <Image 
@@ -40,18 +72,25 @@ export default function DetailProduk() {
             {/* Weight */}
             <View style={styles.detailBox1}>
               <Weight size={24} color="#3498db" />
-              <Text style={styles.detailLabel}>Berat Bersih</Text>
-              <Text style={styles.detailValue}>780gr</Text>
+              <View style={styles.detailTextContainer}>
+                <Text style={styles.detailLabel}>Berat Bersih</Text>
+                <Text style={styles.detailValue}>780gr</Text>
+              </View>
             </View>
             
             {/* Serving */}
             <View style={styles.detailBox2}>
               <UtensilsCrossed size={24} color="#e74c3c" />
-              <Text style={styles.detailLabel}>Jumlah Persajian</Text>
-              <Text style={styles.detailValue}>31</Text>
+              <View style={styles.detailTextContainer}>
+                <Text style={styles.detailLabel}>Jmlh Persajian</Text>
+                <Text style={styles.detailValue}>31</Text>
+              </View>
             </View>
           </View>
           
+          {/* Afiliasi */}
+          <Afiliation />
+
           {/* Informasi Gizi */}
           <InformasiGizi />
           
@@ -61,41 +100,11 @@ export default function DetailProduk() {
           {/* Informasi Produsen */}
           <InformasiProdusen />
           
-          {/* Affiliations */}
-          <View style={styles.affiliationSection}>
-            <Text style={styles.sectionTitle}>Afiliasi</Text>
-            
-            <View style={styles.affiliationRow}>
-              {/* Israel */}
-              <View style={styles.affiliationItem}>
-                <View style={styles.flagContainer}>
-                  <Image 
-                    source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Flag_of_Israel.svg/1200px-Flag_of_Israel.svg.png' }} 
-                    style={styles.flagImage} 
-                  />
-                  <View style={styles.crossLine} />
-                </View>
-                <Text style={styles.affiliationLabel}>Israel</Text>
-                <Text style={styles.affiliationStatus}>Terafiliasi</Text>
-              </View>
-              
-              {/* LGBT */}
-              <View style={styles.affiliationItem}>
-                <Image 
-                  source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Gay_Pride_Flag.svg/1200px-Gay_Pride_Flag.svg.png' }} 
-                  style={styles.flagImage} 
-                />
-                <Text style={styles.affiliationLabel}>LGBT</Text>
-                <Text style={styles.affiliationStatus}>Terafiliasi</Text>
-              </View>
-            </View>
-          </View>
-
           {/* Sertifikasi */}
           <Sertifikasi />
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -108,7 +117,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingTop: 50,
     paddingBottom: 10,
     backgroundColor: '#fff',
   },
@@ -149,74 +157,36 @@ const styles = StyleSheet.create({
   },
   detailBox1: {
     flex: 1,
+    flexDirection: 'row',
     backgroundColor: '#9DD9FF',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: 20,
     marginHorizontal: 6,
+  },
+  detailTextContainer: {
+    flexDirection: 'column',
   },
   detailBox2: {
     flex: 1,
+    flexDirection: 'row',
     backgroundColor: Colors.danger[30],
     borderRadius: 12,
     padding: 16,
+    gap: 20,
     alignItems: 'center',
     marginHorizontal: 6,
   },
   detailLabel: {
     fontSize: 14,
-    color: '#666',
+    color: '#17171F',
     marginTop: 8,
   },
   detailValue: {
     fontSize: 18,
     fontWeight: 'bold',
     marginTop: 4,
-  },
-  affiliationSection: {
-    marginTop: 10,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 16,
-  },
-  affiliationRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  affiliationItem: {
-    alignItems: 'center',
-    width: '48%',
-  },
-  flagContainer: {
-    position: 'relative',
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    overflow: 'hidden',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  flagImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-  },
-  crossLine: {
-    position: 'absolute',
-    width: '140%',
-    height: 3,
-    backgroundColor: 'red',
-    transform: [{ rotate: '45deg' }],
-  },
-  affiliationLabel: {
-    fontSize: 16,
-    marginTop: 8,
-  },
-  affiliationStatus: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 4,
-  },
+  }
 });

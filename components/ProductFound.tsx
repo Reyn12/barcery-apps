@@ -6,13 +6,16 @@ import { router } from 'expo-router'
 
 interface ProductFoundProps {
   product: Product;
-  onPress: () => void;
   onReset?: () => void;
 }
 
-export function ProductFound({ product, onPress, onReset }: ProductFoundProps) {
+export function ProductFound({ product, onReset }: ProductFoundProps) {
 
   const handleNavigateToDetail = () => {
+    // Panggil onReset sebelum navigasi ke halaman detail
+    if (onReset) {
+      onReset();
+    }
     router.push('/detail');
   };
 
