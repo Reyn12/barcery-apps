@@ -9,7 +9,7 @@ import productsData from '../data/products.json';
 import { ProductNotFound } from './ProductNotFound';
 import { ProductFound } from './ProductFound';
 import { Colors } from '../constants/Colors';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, router } from 'expo-router';
 
 // Fungsi untuk mencari produk berdasarkan barcode
 const findProductByBarcode = (barcode: string): Product | undefined => {
@@ -135,6 +135,18 @@ export function ScanScreen() {
     // Tetap biarkan scanned = true agar scanner tidak aktif
   };
 
+  // Navigasi ke halaman setting
+  const navigateToSettings = () => {
+    // Matikan scanner saat navigasi ke setting
+    setScanned(true);
+    // Reset state lainnya
+    setFoundProduct(null);
+    setFrameColor('white');
+    setIsScanning(false);
+    // Navigasi ke halaman setting
+    router.push('/setting');
+  };
+
   const handleResetScanner = () => {
     // Reset scanner untuk scan baru
     setFoundProduct(null);
@@ -203,7 +215,10 @@ export function ScanScreen() {
             >
               <Flashlight size={24} color={flashOn ? "yellow" : "white"} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
+            <TouchableOpacity 
+              style={styles.iconButton}
+              onPress={navigateToSettings}
+            >
               <Settings size={24} color="white" />
             </TouchableOpacity>
           </View>
