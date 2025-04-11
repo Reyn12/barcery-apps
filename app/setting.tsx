@@ -6,6 +6,7 @@ import { router } from 'expo-router';
 import { Colors } from '../constants/Colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BerhasilSimpanData from '../components/setting/BerhasilSimpanData';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function Setting() {
   // State untuk dropdown
@@ -238,7 +239,13 @@ export default function Setting() {
             const title = key.charAt(0).toUpperCase() + key.slice(1);
             
             return (
-              <View key={key} style={styles.limitCard}>
+              <LinearGradient
+                key={key}
+                colors={['#D1FFDA', 'white']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.limitCard}
+              >
                 <View style={styles.limitHeader}>
                   <TouchableOpacity 
                     style={styles.checkboxContainer}
@@ -273,7 +280,7 @@ export default function Setting() {
                     </View>
                   </View>
                 )}
-              </View>
+              </LinearGradient>
             );
           })}
         </View>
@@ -292,7 +299,13 @@ export default function Setting() {
           
           {/* Daftar alergi yang sudah ada */}
           {allergies.map((allergy) => (
-            <View key={allergy.id} style={styles.allergyItem}>
+            <LinearGradient
+              key={allergy.id}
+              colors={['#D1FFDA', 'white']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.allergyItem}
+            >
               <TouchableOpacity 
                 style={styles.radioContainer}
                 onPress={() => toggleAllergySelection(allergy.id)}
@@ -311,12 +324,17 @@ export default function Setting() {
               >
                 <Minus size={18} color="white" />
               </TouchableOpacity>
-            </View>
+            </LinearGradient>
           ))}
           
           {/* Form untuk menambah alergi baru */}
           {showAllergyInput && (
-            <View style={styles.allergyItem}>
+            <LinearGradient
+              colors={['#D1FFDA', 'white']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.allergyItem}
+            >
               <TouchableOpacity 
                 style={styles.radioContainer}
                 onPress={addNewAllergy}
@@ -340,7 +358,7 @@ export default function Setting() {
               >
                 <Minus size={18} color="white" />
               </TouchableOpacity>
-            </View>
+            </LinearGradient>
           )}
           
           {/* Tombol simpan */}
@@ -449,7 +467,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   limitCard: {
-    backgroundColor: 'white',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -515,13 +532,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   allergyItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'white',
     borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    padding: 12,
+    marginBottom: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   radioContainer: {
     flexDirection: 'row',
