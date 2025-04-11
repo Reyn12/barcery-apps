@@ -1,18 +1,20 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView, Switch, Alert } from 'react-native';
+import React, { useState, useEffect, useRef } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView, Switch, RefreshControl, Alert } from 'react-native';
 import { StatusBar } from "expo-status-bar";
 import { ArrowLeft, ChevronDown, ChevronUp, Plus, Minus } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { Colors } from '../constants/Colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import BerhasilSimpanData from '../components/setting/BerhasilSimpanData';
 
 export default function Setting() {
   // State untuk dropdown
   const [filterOpen, setFilterOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState('Semua');
+  const [refreshing, setRefreshing] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
   type ConsumptionKey = 'gula' | 'kalori' | 'garam' | 'lemak';
-
 
   // State untuk batas konsumsi
   const [consumptionLimits, setConsumptionLimits] = useState({
@@ -32,6 +34,7 @@ export default function Setting() {
   ]);
   const [newAllergy, setNewAllergy] = useState('');
   const [showAllergyInput, setShowAllergyInput] = useState(false);
+  const scrollViewRef = useRef<ScrollView>(null);
 
   // Load data dari AsyncStorage saat komponen dimount
   useEffect(() => {
@@ -56,12 +59,19 @@ export default function Setting() {
     }
   };
 
+  // Fungsi untuk refresh data
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadSettings();
+    setRefreshing(false);
+  };
+
   // Fungsi untuk menyimpan data ke AsyncStorage
   const saveSettings = async () => {
     try {
       await AsyncStorage.setItem('consumptionLimits', JSON.stringify(consumptionLimits));
       await AsyncStorage.setItem('allergies', JSON.stringify(allergies));
-      Alert.alert('Sukses', 'Pengaturan berhasil disimpan!');
+      setShowSuccessPopup(true);
     } catch (error) {
       console.error('Error saving settings:', error);
       Alert.alert('Error', 'Gagal menyimpan pengaturan');
@@ -123,6 +133,15 @@ export default function Setting() {
     setAllergies(allergies.filter(allergy => allergy.id !== id));
   };
 
+  // Fungsi untuk menampilkan input alergi baru dan scroll ke bawah
+  const showAllergyInputAndScroll = () => {
+    setShowAllergyInput(true);
+    // Scroll ke bawah setelah input muncul
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+  };
+
   return (
     <>
       <StatusBar style="dark" />
@@ -136,7 +155,18 @@ export default function Setting() {
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Pengaturan</Text>
         </View>
-      <ScrollView style={styles.container}>
+      <ScrollView 
+        style={styles.container}
+        ref={scrollViewRef}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[Colors.primary]}
+            tintColor={Colors.primary}
+          />
+        }
+      >
         
 
         {/* Card Kontributor */}
@@ -153,7 +183,7 @@ export default function Setting() {
               </TouchableOpacity>
             </View>
             <Image 
-              source={require('../assets/images/setting/roket.png')} 
+              source={require('../assets/images/setting/rocket.png')} 
               style={styles.rocketImage}
               resizeMode="contain"
             />
@@ -194,157 +224,58 @@ export default function Setting() {
             </View>
           )}
 
-          {/* Gula */}
-          <View style={styles.limitCard}>
-            <View style={styles.limitHeader}>
-              <TouchableOpacity 
-                style={styles.checkboxContainer}
-                onPress={() => toggleConsumptionLimit('gula')}
-              >
-                <View style={[
-                  styles.checkbox,
-                  consumptionLimits.gula.active && styles.checkboxActive
-                ]}>
-                  {consumptionLimits.gula.active && <Text style={styles.checkmark}>✓</Text>}
+          {/* Batas Konsumsi Cards */}
+          {Object.entries(consumptionLimits).map(([key, limit]) => {
+            const nutrient = key as ConsumptionKey;
+            const placeholders: Record<ConsumptionKey, string> = {
+              gula: '100',
+              kalori: '2000',
+              garam: '5',
+              lemak: '65'
+            };
+            
+            // Kapitalisasi huruf pertama untuk judul
+            const title = key.charAt(0).toUpperCase() + key.slice(1);
+            
+            return (
+              <View key={key} style={styles.limitCard}>
+                <View style={styles.limitHeader}>
+                  <TouchableOpacity 
+                    style={styles.checkboxContainer}
+                    onPress={() => toggleConsumptionLimit(nutrient)}
+                  >
+                    <View style={[
+                      styles.checkbox,
+                      limit.active && styles.checkboxActive
+                    ]}>
+                      {limit.active && <Text style={styles.checkmark}>✓</Text>}
+                    </View>
+                    <Text style={styles.limitTitle}>{title}</Text>
+                  </TouchableOpacity>
                 </View>
-                <Text style={styles.limitTitle}>Gula</Text>
-              </TouchableOpacity>
-            </View>
-            {consumptionLimits.gula.active && (
-              <View style={styles.limitInputContainer}>
-                <Text style={styles.limitLabel}>Atur Batas Gula</Text>
-                <View style={styles.inputRow}>
-                  <TextInput
-                    style={styles.valueInput}
-                    value={consumptionLimits.gula.value}
-                    onChangeText={(text) => updateConsumptionValue('gula', text)}
-                    keyboardType="numeric"
-                    placeholder="100"
-                  />
-                  <TextInput
-                    style={styles.unitInput}
-                    value={consumptionLimits.gula.unit}
-                    onChangeText={(text) => updateConsumptionUnit('gula', text)}
-                    placeholder="g"
-                  />
-                </View>
+                {limit.active && (
+                  <View style={styles.limitInputContainer}>
+                    <Text style={styles.limitLabel}>Atur Batas {title}</Text>
+                    <View style={styles.inputRow}>
+                      <TextInput
+                        style={styles.valueInput}
+                        value={limit.value}
+                        onChangeText={(text) => updateConsumptionValue(nutrient, text)}
+                        keyboardType="numeric"
+                        placeholder={placeholders[nutrient]}
+                      />
+                      <TextInput
+                        style={styles.unitInput}
+                        value={limit.unit}
+                        onChangeText={(text) => updateConsumptionUnit(nutrient, text)}
+                        placeholder={nutrient === 'kalori' ? 'kkal' : 'g'}
+                      />
+                    </View>
+                  </View>
+                )}
               </View>
-            )}
-          </View>
-
-          {/* Kalori */}
-          <View style={styles.limitCard}>
-            <View style={styles.limitHeader}>
-              <TouchableOpacity 
-                style={styles.checkboxContainer}
-                onPress={() => toggleConsumptionLimit('kalori')}
-              >
-                <View style={[
-                  styles.checkbox,
-                  consumptionLimits.kalori.active && styles.checkboxActive
-                ]}>
-                  {consumptionLimits.kalori.active && <Text style={styles.checkmark}>✓</Text>}
-                </View>
-                <Text style={styles.limitTitle}>Kalori</Text>
-              </TouchableOpacity>
-            </View>
-            {consumptionLimits.kalori.active && (
-              <View style={styles.limitInputContainer}>
-                <Text style={styles.limitLabel}>Atur Batas Kalori</Text>
-                <View style={styles.inputRow}>
-                  <TextInput
-                    style={styles.valueInput}
-                    value={consumptionLimits.kalori.value}
-                    onChangeText={(text) => updateConsumptionValue('kalori', text)}
-                    keyboardType="numeric"
-                    placeholder="2000"
-                  />
-                  <TextInput
-                    style={styles.unitInput}
-                    value={consumptionLimits.kalori.unit}
-                    onChangeText={(text) => updateConsumptionUnit('kalori', text)}
-                    placeholder="kkal"
-                  />
-                </View>
-              </View>
-            )}
-          </View>
-
-          {/* Garam */}
-          <View style={styles.limitCard}>
-            <View style={styles.limitHeader}>
-              <TouchableOpacity 
-                style={styles.checkboxContainer}
-                onPress={() => toggleConsumptionLimit('garam')}
-              >
-                <View style={[
-                  styles.checkbox,
-                  consumptionLimits.garam.active && styles.checkboxActive
-                ]}>
-                  {consumptionLimits.garam.active && <Text style={styles.checkmark}>✓</Text>}
-                </View>
-                <Text style={styles.limitTitle}>Garam</Text>
-              </TouchableOpacity>
-            </View>
-            {consumptionLimits.garam.active && (
-              <View style={styles.limitInputContainer}>
-                <Text style={styles.limitLabel}>Atur Batas Garam</Text>
-                <View style={styles.inputRow}>
-                  <TextInput
-                    style={styles.valueInput}
-                    value={consumptionLimits.garam.value}
-                    onChangeText={(text) => updateConsumptionValue('garam', text)}
-                    keyboardType="numeric"
-                    placeholder="5"
-                  />
-                  <TextInput
-                    style={styles.unitInput}
-                    value={consumptionLimits.garam.unit}
-                    onChangeText={(text) => updateConsumptionUnit('garam', text)}
-                    placeholder="g"
-                  />
-                </View>
-              </View>
-            )}
-          </View>
-
-          {/* Lemak */}
-          <View style={styles.limitCard}>
-            <View style={styles.limitHeader}>
-              <TouchableOpacity 
-                style={styles.checkboxContainer}
-                onPress={() => toggleConsumptionLimit('lemak')}
-              >
-                <View style={[
-                  styles.checkbox,
-                  consumptionLimits.lemak.active && styles.checkboxActive
-                ]}>
-                  {consumptionLimits.lemak.active && <Text style={styles.checkmark}>✓</Text>}
-                </View>
-                <Text style={styles.limitTitle}>Lemak</Text>
-              </TouchableOpacity>
-            </View>
-            {consumptionLimits.lemak.active && (
-              <View style={styles.limitInputContainer}>
-                <Text style={styles.limitLabel}>Atur Batas Lemak</Text>
-                <View style={styles.inputRow}>
-                  <TextInput
-                    style={styles.valueInput}
-                    value={consumptionLimits.lemak.value}
-                    onChangeText={(text) => updateConsumptionValue('lemak', text)}
-                    keyboardType="numeric"
-                    placeholder="65"
-                  />
-                  <TextInput
-                    style={styles.unitInput}
-                    value={consumptionLimits.lemak.unit}
-                    onChangeText={(text) => updateConsumptionUnit('lemak', text)}
-                    placeholder="g"
-                  />
-                </View>
-              </View>
-            )}
-          </View>
+            );
+          })}
         </View>
 
         {/* Daftar Alergi */}
@@ -353,7 +284,7 @@ export default function Setting() {
             <Text style={styles.sectionTitle}>Daftar Alergi Kamu</Text>
             <TouchableOpacity 
               style={styles.addButton}
-              onPress={() => setShowAllergyInput(true)}
+              onPress={showAllergyInputAndScroll}
             >
               <Plus size={20} color="white" />
             </TouchableOpacity>
@@ -395,7 +326,7 @@ export default function Setting() {
                   style={styles.allergyInput}
                   value={newAllergy}
                   onChangeText={setNewAllergy}
-                  placeholder="Masukkan alergi"
+                  placeholder="Contoh: Kacang, Seafood, Susu, dll"
                   onSubmitEditing={addNewAllergy}
                   autoFocus={true}
                 />
@@ -423,6 +354,12 @@ export default function Setting() {
 
         
       </ScrollView>
+
+      {/* Popup Berhasil Simpan Data */}
+      <BerhasilSimpanData 
+        visible={showSuccessPopup}
+        onClose={() => setShowSuccessPopup(false)}
+      />
     </>
   );
 }
@@ -670,7 +607,7 @@ const styles = StyleSheet.create({
     maxWidth: '70%',
   },
   loginButton: {
-    backgroundColor: Colors.success[50],
+    backgroundColor: Colors.primary,
     paddingVertical: 10,
     paddingHorizontal: 24,
     borderRadius: 8,
@@ -681,7 +618,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   rocketImage: {
-    width: 100,
-    height: 100,
+    width: 130,
+    height: 130,
   },
 });
