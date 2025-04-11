@@ -16,9 +16,8 @@ export function KomposisiProduk() {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.neutral[10],
-    padding: 16,
+    paddingHorizontal: 16,
     borderRadius: 12,
-    marginVertical: 10,
   },
   title: {
     fontSize: 18,
