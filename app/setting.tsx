@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView, Switch, RefreshControl, Alert } from 'react-native';
 import { StatusBar } from "expo-status-bar";
-import { ArrowLeft, ChevronDown, ChevronUp, Plus, Minus } from 'lucide-react-native';
+import { ArrowLeft, ChevronDown, ChevronUp, Plus, Minus, AlertCircle } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { Colors } from '../constants/Colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -210,7 +210,10 @@ export default function Setting() {
               {['Semua', 'Dipilih', 'Belum Dipilih'].map((option) => (
                 <TouchableOpacity 
                   key={option}
-                  style={styles.dropdownItem}
+                  style={[
+                    styles.dropdownItem,
+                    selectedFilter === option && styles.selectedDropdownItem
+                  ]}
                   onPress={() => {
                     setSelectedFilter(option);
                     setFilterOpen(false);
@@ -226,7 +229,14 @@ export default function Setting() {
           )}
 
           {/* Batas Konsumsi Cards */}
-          {Object.entries(consumptionLimits).map(([key, limit]) => {
+          {Object.entries(consumptionLimits)
+            .filter(([key, limit]) => {
+              if (selectedFilter === 'Semua') return true;
+              if (selectedFilter === 'Dipilih') return limit.active;
+              if (selectedFilter === 'Belum Dipilih') return !limit.active;
+              return true;
+            })
+            .map(([key, limit]) => {
             const nutrient = key as ConsumptionKey;
             const placeholders: Record<ConsumptionKey, string> = {
               gula: '100',
@@ -283,49 +293,84 @@ export default function Setting() {
               </LinearGradient>
             );
           })}
+          
+          {/* Tampilkan pesan ketika tidak ada item yang sesuai filter */}
+          {Object.entries(consumptionLimits).filter(([key, limit]) => {
+            if (selectedFilter === 'Semua') return true;
+            if (selectedFilter === 'Dipilih') return limit.active;
+            if (selectedFilter === 'Belum Dipilih') return !limit.active;
+            return true;
+          }).length === 0 && (
+            <View style={styles.emptyStateContainer}>
+              <AlertCircle size={24} color={Colors.neutral[50]} />
+              <Text style={styles.emptyStateText}>Belum ada item yang kamu pilih</Text>
+            </View>
+          )}
         </View>
 
         {/* Daftar Alergi */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Daftar Alergi Kamu</Text>
-            <TouchableOpacity 
-              style={styles.addButton}
-              onPress={showAllergyInputAndScroll}
-            >
-              <Plus size={20} color="white" />
-            </TouchableOpacity>
+            <View style={styles.headerActions}>
+              <TouchableOpacity 
+                style={styles.addButton}
+                onPress={showAllergyInputAndScroll}
+              >
+                <Plus size={20} color="white" />
+              </TouchableOpacity>
+            </View>
           </View>
           
           {/* Daftar alergi yang sudah ada */}
-          {allergies.map((allergy) => (
-            <LinearGradient
-              key={allergy.id}
-              colors={['#D1FFDA', 'white']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.allergyItem}
-            >
-              <TouchableOpacity 
-                style={styles.radioContainer}
-                onPress={() => toggleAllergySelection(allergy.id)}
+          {allergies
+            .filter(allergy => {
+              if (selectedFilter === 'Semua') return true;
+              if (selectedFilter === 'Dipilih') return allergy.selected;
+              if (selectedFilter === 'Belum Dipilih') return !allergy.selected;
+              return true;
+            })
+            .map((allergy) => (
+              <LinearGradient
+                key={allergy.id}
+                colors={['#D1FFDA', 'white']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.allergyItem}
               >
-                <View style={[
-                  styles.radioButton,
-                  allergy.selected && styles.radioButtonSelected
-                ]}>
-                  {allergy.selected && <View style={styles.radioInner} />}
-                </View>
-                <Text style={styles.allergyName}>{allergy.name}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={styles.removeButton}
-                onPress={() => removeAllergy(allergy.id)}
-              >
-                <Minus size={18} color="white" />
-              </TouchableOpacity>
-            </LinearGradient>
-          ))}
+                <TouchableOpacity 
+                  style={styles.radioContainer}
+                  onPress={() => toggleAllergySelection(allergy.id)}
+                >
+                  <View style={[
+                    styles.radioButton,
+                    allergy.selected && styles.radioButtonSelected
+                  ]}>
+                    {allergy.selected && <View style={styles.radioInner} />}
+                  </View>
+                  <Text style={styles.allergyName}>{allergy.name}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.removeButton}
+                  onPress={() => removeAllergy(allergy.id)}
+                >
+                  <Minus size={18} color="white" />
+                </TouchableOpacity>
+              </LinearGradient>
+            ))}
+          
+          {/* Tampilkan pesan ketika tidak ada item yang sesuai filter */}
+          {allergies.filter(allergy => {
+            if (selectedFilter === 'Semua') return true;
+            if (selectedFilter === 'Dipilih') return allergy.selected;
+            if (selectedFilter === 'Belum Dipilih') return !allergy.selected;
+            return true;
+          }).length === 0 && (
+            <View style={styles.emptyStateContainer}>
+              <AlertCircle size={24} color={Colors.neutral[50]} />
+              <Text style={styles.emptyStateText}>Belum ada item yang kamu pilih</Text>
+            </View>
+          )}
           
           {/* Form untuk menambah alergi baru */}
           {showAllergyInput && (
@@ -455,16 +500,25 @@ const styles = StyleSheet.create({
     borderColor: Colors.neutral[30],
     width: 150,
     zIndex: 1000,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   dropdownItem: {
     paddingVertical: 12,
     paddingHorizontal: 16,
+  },
+  selectedDropdownItem: {
+    backgroundColor: Colors.neutral[10],
   },
   dropdownText: {
     fontSize: 14,
   },
   selectedDropdownText: {
     fontWeight: 'bold',
+    color: Colors.primary,
   },
   limitCard: {
     borderRadius: 12,
@@ -636,5 +690,23 @@ const styles = StyleSheet.create({
   rocketImage: {
     width: 130,
     height: 130,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  emptyStateContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    marginVertical: 8,
+  },
+  emptyStateText: {
+    marginTop: 8,
+    fontSize: 14,
+    color: Colors.neutral[70],
+    textAlign: 'center',
   },
 });
