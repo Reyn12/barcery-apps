@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView, Switch, RefreshControl, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, RefreshControl, Alert } from 'react-native';
 import { StatusBar } from "expo-status-bar";
-import { ArrowLeft, ChevronDown, ChevronUp, Plus, Minus, AlertCircle } from 'lucide-react-native';
+import { ArrowLeft } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { Colors } from '../constants/Colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BerhasilSimpanData from '../components/setting/BerhasilSimpanData';
-import { LinearGradient } from 'expo-linear-gradient';
+import BatasKonsumsi from '../components/setting/BatasKonsumsi';
+import DaftarAlergi from '../components/setting/DaftarAlergi';
 
 export default function Setting() {
   // State untuk dropdown
@@ -192,229 +193,31 @@ export default function Setting() {
         </View>
 
         {/* Pengaturan Batas Konsumsi */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Atur Batas Konsumsi Kamu</Text>
-            <TouchableOpacity 
-              style={styles.filterButton}
-              onPress={() => setFilterOpen(!filterOpen)}
-            >
-              <Text style={styles.filterText}>{selectedFilter}</Text>
-              {filterOpen ? <ChevronUp size={20} color="black" /> : <ChevronDown size={20} color="black" />}
-            </TouchableOpacity>
-          </View>
-
-          {/* Dropdown filter */}
-          {filterOpen && (
-            <View style={styles.dropdown}>
-              {['Semua', 'Dipilih', 'Belum Dipilih'].map((option) => (
-                <TouchableOpacity 
-                  key={option}
-                  style={[
-                    styles.dropdownItem,
-                    selectedFilter === option && styles.selectedDropdownItem
-                  ]}
-                  onPress={() => {
-                    setSelectedFilter(option);
-                    setFilterOpen(false);
-                  }}
-                >
-                  <Text style={[
-                    styles.dropdownText,
-                    selectedFilter === option && styles.selectedDropdownText
-                  ]}>{option}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-
-          {/* Batas Konsumsi Cards */}
-          {Object.entries(consumptionLimits)
-            .filter(([key, limit]) => {
-              if (selectedFilter === 'Semua') return true;
-              if (selectedFilter === 'Dipilih') return limit.active;
-              if (selectedFilter === 'Belum Dipilih') return !limit.active;
-              return true;
-            })
-            .map(([key, limit]) => {
-            const nutrient = key as ConsumptionKey;
-            const placeholders: Record<ConsumptionKey, string> = {
-              gula: '100',
-              kalori: '2000',
-              garam: '5',
-              lemak: '65'
-            };
-            
-            // Kapitalisasi huruf pertama untuk judul
-            const title = key.charAt(0).toUpperCase() + key.slice(1);
-            
-            return (
-              <LinearGradient
-                key={key}
-                colors={['#D1FFDA', 'white']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.limitCard}
-              >
-                <View style={styles.limitHeader}>
-                  <TouchableOpacity 
-                    style={styles.checkboxContainer}
-                    onPress={() => toggleConsumptionLimit(nutrient)}
-                  >
-                    <View style={[
-                      styles.checkbox,
-                      limit.active && styles.checkboxActive
-                    ]}>
-                      {limit.active && <Text style={styles.checkmark}>✓</Text>}
-                    </View>
-                    <Text style={styles.limitTitle}>{title}</Text>
-                  </TouchableOpacity>
-                </View>
-                {limit.active && (
-                  <View style={styles.limitInputContainer}>
-                    <Text style={styles.limitLabel}>Atur Batas {title}</Text>
-                    <View style={styles.inputRow}>
-                      <TextInput
-                        style={styles.valueInput}
-                        value={limit.value}
-                        onChangeText={(text) => updateConsumptionValue(nutrient, text)}
-                        keyboardType="numeric"
-                        placeholder={placeholders[nutrient]}
-                      />
-                      <TextInput
-                        style={styles.unitInput}
-                        value={limit.unit}
-                        onChangeText={(text) => updateConsumptionUnit(nutrient, text)}
-                        placeholder={nutrient === 'kalori' ? 'kkal' : 'g'}
-                      />
-                    </View>
-                  </View>
-                )}
-              </LinearGradient>
-            );
-          })}
-          
-          {/* Tampilkan pesan ketika tidak ada item yang sesuai filter */}
-          {Object.entries(consumptionLimits).filter(([key, limit]) => {
-            if (selectedFilter === 'Semua') return true;
-            if (selectedFilter === 'Dipilih') return limit.active;
-            if (selectedFilter === 'Belum Dipilih') return !limit.active;
-            return true;
-          }).length === 0 && (
-            <View style={styles.emptyStateContainer}>
-              <AlertCircle size={24} color={Colors.neutral[50]} />
-              <Text style={styles.emptyStateText}>Belum ada item yang kamu pilih</Text>
-            </View>
-          )}
-        </View>
+        <BatasKonsumsi 
+          filterOpen={filterOpen}
+          selectedFilter={selectedFilter}
+          consumptionLimits={consumptionLimits}
+          setFilterOpen={setFilterOpen}
+          setSelectedFilter={setSelectedFilter}
+          toggleConsumptionLimit={toggleConsumptionLimit}
+          updateConsumptionValue={updateConsumptionValue}
+          updateConsumptionUnit={updateConsumptionUnit}
+        />
 
         {/* Daftar Alergi */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Daftar Alergi Kamu</Text>
-            <View style={styles.headerActions}>
-              <TouchableOpacity 
-                style={styles.addButton}
-                onPress={showAllergyInputAndScroll}
-              >
-                <Plus size={20} color="white" />
-              </TouchableOpacity>
-            </View>
-          </View>
-          
-          {/* Daftar alergi yang sudah ada */}
-          {allergies
-            .filter(allergy => {
-              if (selectedFilter === 'Semua') return true;
-              if (selectedFilter === 'Dipilih') return allergy.selected;
-              if (selectedFilter === 'Belum Dipilih') return !allergy.selected;
-              return true;
-            })
-            .map((allergy) => (
-              <LinearGradient
-                key={allergy.id}
-                colors={['#D1FFDA', 'white']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.allergyItem}
-              >
-                <TouchableOpacity 
-                  style={styles.radioContainer}
-                  onPress={() => toggleAllergySelection(allergy.id)}
-                >
-                  <View style={[
-                    styles.radioButton,
-                    allergy.selected && styles.radioButtonSelected
-                  ]}>
-                    {allergy.selected && <View style={styles.radioInner} />}
-                  </View>
-                  <Text style={styles.allergyName}>{allergy.name}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={styles.removeButton}
-                  onPress={() => removeAllergy(allergy.id)}
-                >
-                  <Minus size={18} color="white" />
-                </TouchableOpacity>
-              </LinearGradient>
-            ))}
-          
-          {/* Tampilkan pesan ketika tidak ada item yang sesuai filter */}
-          {allergies.filter(allergy => {
-            if (selectedFilter === 'Semua') return true;
-            if (selectedFilter === 'Dipilih') return allergy.selected;
-            if (selectedFilter === 'Belum Dipilih') return !allergy.selected;
-            return true;
-          }).length === 0 && (
-            <View style={styles.emptyStateContainer}>
-              <AlertCircle size={24} color={Colors.neutral[50]} />
-              <Text style={styles.emptyStateText}>Belum ada item yang kamu pilih</Text>
-            </View>
-          )}
-          
-          {/* Form untuk menambah alergi baru */}
-          {showAllergyInput && (
-            <LinearGradient
-              colors={['#D1FFDA', 'white']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.allergyItem}
-            >
-              <TouchableOpacity 
-                style={styles.radioContainer}
-                onPress={addNewAllergy}
-              >
-                <View style={styles.radioButton} />
-                <TextInput
-                  style={styles.allergyInput}
-                  value={newAllergy}
-                  onChangeText={setNewAllergy}
-                  placeholder="Contoh: Kacang, Seafood, Susu, dll"
-                  onSubmitEditing={addNewAllergy}
-                  autoFocus={true}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={styles.removeButton}
-                onPress={() => {
-                  setNewAllergy('');
-                  setShowAllergyInput(false);
-                }}
-              >
-                <Minus size={18} color="white" />
-              </TouchableOpacity>
-            </LinearGradient>
-          )}
-          
-          {/* Tombol simpan */}
-          <TouchableOpacity 
-            style={styles.saveButton}
-            onPress={saveSettings}
-          >
-            <Text style={styles.saveButtonText}>Simpan Perubahan</Text>
-          </TouchableOpacity>
-        </View>
-
+        <DaftarAlergi 
+          selectedFilter={selectedFilter}
+          allergies={allergies}
+          newAllergy={newAllergy}
+          showAllergyInput={showAllergyInput}
+          toggleAllergySelection={toggleAllergySelection}
+          removeAllergy={removeAllergy}
+          setNewAllergy={setNewAllergy}
+          setShowAllergyInput={setShowAllergyInput}
+          addNewAllergy={addNewAllergy}
+          showAllergyInputAndScroll={showAllergyInputAndScroll}
+          saveSettings={saveSettings}
+        />
         
       </ScrollView>
 
@@ -451,200 +254,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginLeft: 8,
-  },
-  section: {
-    marginTop: 16,
-    marginHorizontal: 16,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: Colors.neutral[90],
-  },
-  addButton: {
-    backgroundColor: Colors.primary,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 15,
-  },
-  filterButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: Colors.neutral[30],
-  },
-  filterText: {
-    fontSize: 14,
-    marginRight: 4,
-  },
-  dropdown: {
-    position: 'absolute',
-    top: 50,
-    right: 0,
-    backgroundColor: 'white',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: Colors.neutral[30],
-    width: 150,
-    zIndex: 1000,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  dropdownItem: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-  },
-  selectedDropdownItem: {
-    backgroundColor: Colors.neutral[10],
-  },
-  dropdownText: {
-    fontSize: 14,
-  },
-  selectedDropdownText: {
-    fontWeight: 'bold',
-    color: Colors.primary,
-  },
-  limitCard: {
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-  },
-  limitHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  checkboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 4,
-    borderWidth: 2,
-    borderColor: Colors.success[50],
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkboxActive: {
-    backgroundColor: Colors.success[50],
-  },
-  checkmark: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  limitTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginLeft: 12,
-  },
-  limitInputContainer: {
-    marginTop: 12,
-  },
-  limitLabel: {
-    fontSize: 14,
-    color: Colors.neutral[70],
-    marginBottom: 8,
-  },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  valueInput: {
-    flex: 1,
-    height: 48,
-    borderWidth: 1,
-    borderColor: Colors.neutral[30],
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    marginRight: 8,
-  },
-  unitInput: {
-    width: 80,
-    height: 48,
-    borderWidth: 1,
-    borderColor: Colors.neutral[30],
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    textAlign: 'center',
-  },
-  allergyItem: {
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 8,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  radioContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  radioButton: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: Colors.neutral[50],
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  radioButtonSelected: {
-    borderColor: Colors.success[50],
-  },
-  radioInner: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: Colors.success[50],
-  },
-  allergyName: {
-    fontSize: 16,
-    marginLeft: 12,
-  },
-  allergyInput: {
-    fontSize: 16,
-    marginLeft: 12,
-    flex: 1,
-  },
-  removeButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: Colors.danger[50],
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  saveButton: {
-    backgroundColor: Colors.success[50],
-    borderRadius: 8,
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginTop: 16,
-    marginBottom: 24,
-  },
-  saveButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
   contributorCard: {
     backgroundColor: Colors.success[10],
@@ -690,23 +299,5 @@ const styles = StyleSheet.create({
   rocketImage: {
     width: 130,
     height: 130,
-  },
-  headerActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  emptyStateContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
-    backgroundColor: 'white',
-    borderRadius: 12,
-    marginVertical: 8,
-  },
-  emptyStateText: {
-    marginTop: 8,
-    fontSize: 14,
-    color: Colors.neutral[70],
-    textAlign: 'center',
   },
 });
