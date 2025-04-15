@@ -1,5 +1,5 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import { Stack } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { Colors } from '../../constants/Colors';
 
 export default function WelcomeScreen() {
@@ -28,7 +28,7 @@ export default function WelcomeScreen() {
 
         <Text style={styles.terms}>Syarat dan Ketentuan</Text>
 
-        <TouchableOpacity style={styles.button} onPress={() => {}}>
+        <TouchableOpacity style={styles.button} onPress={() => router.push('/contributor/auth/login')}>
           <Text style={styles.buttonText}>Mulai</Text>
         </TouchableOpacity>
 
