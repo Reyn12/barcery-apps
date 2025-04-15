@@ -1,7 +1,6 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { Stack } from 'expo-router';
 import { Colors } from '@/constants/Colors';
-import { UserCircle2 } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header } from '@/components/contributor/Header';
 import { CariProduk } from '@/components/contributor/CariProduk';
@@ -12,8 +11,13 @@ export default function DashboardScreen() {
     <>
       <Header />
       <View style={styles.mainContent}>
-        <CariProduk />
-        <CardProduk />
+        <ScrollView 
+          style={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+        >
+          <CariProduk />
+          <CardProduk />
+        </ScrollView>
       </View>
     </>
   );
@@ -24,7 +28,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderTopLeftRadius: 35,
     borderTopRightRadius: 35,
-    padding: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 8,
     marginTop: -40,
     flex: 1,
     width: '100%',
@@ -38,5 +43,9 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     // Shadow untuk Android
     elevation: 5,
+  },
+  scrollContainer: {
+    flex: 1,
+    width: '100%',
   }
 });
