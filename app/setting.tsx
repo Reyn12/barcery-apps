@@ -181,7 +181,7 @@ export default function Setting() {
                 Login untuk menambahkan produk favoritmu
               </Text>
               <TouchableOpacity style={styles.loginButton}>
-                <Text style={styles.loginButtonText}>Login</Text>
+                <Text style={styles.loginButtonText} onPress={() => router.push('/contributor')}>Login</Text>
               </TouchableOpacity>
             </View>
             <Image 
