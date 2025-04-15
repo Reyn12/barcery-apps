@@ -9,6 +9,11 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const handleLogin = () => {
+    // TODO: Implement login logic
+    router.push('/contributor/dashboard');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Stack.Screen 
@@ -55,7 +60,7 @@ export default function LoginScreen() {
             </View>
           </View>
 
-          <TouchableOpacity style={styles.loginButton}>
+          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
             <Text style={styles.loginButtonText}>LOGIN</Text>
           </TouchableOpacity>
 
