@@ -1,39 +1,35 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import { router, Stack } from 'expo-router';
+import { router } from 'expo-router';
 import { Colors } from '../../constants/Colors';
 
 export default function WelcomeScreen() {
   return (
-    <View style={styles.container}>
-      <Stack.Screen 
-        options={{
-          headerShown: false,
-        }} 
-      />
-      
-      <View style={styles.content}>
-        <Image 
-          source={require('../../assets/images/contributor/logoWelcomeContributor.png')}
-          style={styles.image}
-          resizeMode="contain"
-        />
-        
-        <Text style={styles.title}>Cek Produk Secara{'\n'}Detail dan Teliti</Text>
-        
-        <Text style={styles.description}>
-          Cek informasi produk, mulai dari gizi,{'\n'}
-          sertifikasi, hingga afiliasi dengan Barcery.{'\n'}
-          Yuk, lebih teliti dalam memilih produk
-        </Text>
+  <View style={styles.container}>
+  
+  <View style={styles.content}>
+    <Image 
+      source={require('../../assets/images/contributor/logoWelcomeContributor.png')}
+      style={styles.image}
+      resizeMode="contain"
+    />
+    
+    <Text style={styles.title}>Cek Produk Secara{'\n'}Detail dan Teliti</Text>
+    
+    <Text style={styles.description}>
+      Cek informasi produk, mulai dari gizi,{'\n'}
+      sertifikasi, hingga afiliasi dengan Barcery.{'\n'}
+      Yuk, lebih teliti dalam memilih produk
+    </Text>
 
-        <Text style={styles.terms}>Syarat dan Ketentuan</Text>
+    <Text style={styles.terms}>Syarat dan Ketentuan</Text>
+  </View>
 
-        <TouchableOpacity style={styles.button} onPress={() => router.push('/contributor/auth/login')}>
-          <Text style={styles.buttonText}>Mulai</Text>
-        </TouchableOpacity>
-
-      </View>
-    </View>
+  <View style={styles.buttonContainer}>
+    <TouchableOpacity style={styles.button} onPress={() => router.push('/contributor/auth/login')}>
+      <Text style={styles.buttonText}>Mulai</Text>
+    </TouchableOpacity>
+  </View>
+</View>
   );
 }
 
@@ -71,12 +67,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 30,
   },
+  buttonContainer: {
+    position: 'absolute',
+    bottom: 60,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 20,
+  },
   button: {
     width: '100%',
     backgroundColor: Colors.primary,
     paddingVertical: 16,
     borderRadius: 8,
-    marginBottom: 16,
   },
   buttonText: {
     color: '#fff',
