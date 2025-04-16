@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { User } from 'lucide-react-native';
+import { router } from 'expo-router';
 
 export function Header() {
     return (
@@ -19,7 +20,10 @@ export function Header() {
                         </View>
                     </View>
 
-                    <TouchableOpacity style={styles.profileIcon}>
+                    <TouchableOpacity 
+                        style={styles.profileIcon}
+                        onPress={() => router.push('/contributor/dashboard/profile')}
+                    >
                         <User color={Colors.neutral[10]} size={24} />
                     </TouchableOpacity>
                 </View>
