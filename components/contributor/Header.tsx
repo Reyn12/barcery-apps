@@ -1,6 +1,7 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { User } from 'lucide-react-native';
 
 export function Header() {
     return (
@@ -17,6 +18,10 @@ export function Header() {
                             <Text style={styles.welcome}>Welcome back</Text>
                         </View>
                     </View>
+
+                    <TouchableOpacity style={styles.profileIcon}>
+                        <User color={Colors.neutral[10]} size={24} />
+                    </TouchableOpacity>
                 </View>
             </SafeAreaView>
         </View>
@@ -34,7 +39,7 @@ const styles = StyleSheet.create({
     topSection: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'flex-start',
+        alignItems: 'center',
         paddingTop: 16,
     },
     greetingContainer: {
@@ -60,5 +65,8 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         borderRadius: 24,
+    },
+    profileIcon: {
+        padding: 4,
     },
 });
