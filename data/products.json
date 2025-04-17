@@ -8,6 +8,9 @@
     "category": "Makanan",
     "stock": 50,
     "variation": "Original",
+    "status": "in-check",
+    "statusText": "In-check",
+    "image": "/assets/images/contributor/kokoCrunch.png",
     "affiliations": ["israel"],
     "nutritionInfo": {
       "energiTotal": 120,
@@ -36,7 +39,40 @@
     "description": "Air mineral dalam kemasan botol",
     "category": "Minuman",
     "stock": 100,
+    "status": "published",
+    "statusText": "Published",
+    "image": "/assets/images/contributor/kokoCrunch.png",
     "affiliations": ["lgbt", "israel"],
     "composition": ["Air mineral"]
+  },
+  {
+    "id": "3",
+    "name": "Chitato",
+    "barcode": "8992775211123",
+    "price": 10000,
+    "description": "Keripik kentang dengan berbagai rasa",
+    "category": "Makanan",
+    "stock": 75,
+    "variation": "Sapi Panggang",
+    "status": "in-check",
+    "statusText": "In-check",
+    "image": "/assets/images/contributor/kokoCrunch.png",
+    "affiliations": [],
+    "composition": ["Kentang", "Minyak nabati", "Garam", "Bumbu perisa"]
+  },
+  {
+    "id": "4",
+    "name": "Pocky",
+    "barcode": "4901005510517",
+    "price": 12000,
+    "description": "Biskuit stik berlapis coklat",
+    "category": "Makanan",
+    "stock": 60,
+    "variation": "Chocolate",
+    "status": "published",
+    "statusText": "Published",
+    "image": "/assets/images/contributor/kokoCrunch.png",
+    "affiliations": [],
+    "composition": ["Tepung terigu", "Gula", "Minyak nabati", "Coklat", "Susu bubuk"]
   }
 ]

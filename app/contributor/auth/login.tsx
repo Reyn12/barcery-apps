@@ -67,13 +67,13 @@ export default function LoginScreen() {
           <Text style={styles.orText}>atau lanjutkan dengan</Text>
 
           <View style={styles.socialButtons}>
-            <TouchableOpacity style={styles.socialButton}>
+            <TouchableOpacity>
               <Image source={require('../../../assets/icons/icGoogle.png')} style={styles.socialIcon} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.socialButton}>
+            <TouchableOpacity>
               <Image source={require('../../../assets/icons/icApple.png')} style={styles.socialIcon} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.socialButton}>
+            <TouchableOpacity>
               <Image source={require('../../../assets/icons/icFb.png')} style={styles.socialIcon} />
             </TouchableOpacity>
           </View>
@@ -166,18 +166,9 @@ const styles = StyleSheet.create({
     gap: 16,
     marginBottom: 24,
   },
-  socialButton: {
+  socialIcon: {
     width: 48,
     height: 48,
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: Colors.neutral[30],
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  socialIcon: {
-    width: 24,
-    height: 24,
   },
   signupContainer: {
     flexDirection: 'row',

@@ -2,53 +2,31 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { Pencil, Trash2 } from 'lucide-react-native';
+import productsData from '@/data/products.json';
 
-// Data produk untuk di-mapping
-const productData = [
-  {
-    id: 1,
-    status: 'in-check',
-    statusText: 'In-check',
-    statusStyle: (styles: { inCheckText: any; }) => styles.inCheckText,
-    name: 'Koko Krunch',
-    image: require('@/assets/images/contributor/kokoCrunch.png')
-  },
-  {
-    id: 2,
-    status: 'published',
-    statusText: 'Published',
-    statusStyle: (styles: { publishText: any; }) => styles.publishText,
-    name: 'Oreo Biskuit',
-    image: require('@/assets/images/contributor/kokoCrunch.png') // Ganti dengan gambar yang sesuai
-  },
-  {
-    id: 3,
-    status: 'in-check',
-    statusText: 'In-check',
-    statusStyle: (styles: { inCheckText: any; }) => styles.inCheckText,
-    name: 'Chitato',
-    image: require('@/assets/images/contributor/kokoCrunch.png') // Ganti dengan gambar yang sesuai
-  },
-  {
-    id: 4,
-    status: 'published',
-    statusText: 'Published',
-    statusStyle: (styles: { publishText: any; }) => styles.publishText,
-    name: 'Pocky',
-    image: require('@/assets/images/contributor/kokoCrunch.png') // Ganti dengan gambar yang sesuai
+// Fungsi untuk menentukan style berdasarkan status
+const getStatusStyle = (status: string, styles: any) => {
+  if (status === 'in-check') {
+    return styles.inCheckText;
+  } else if (status === 'published') {
+    return styles.publishText;
   }
-];
+  return styles.inCheckText; // Default style
+};
+
+// Gambar default untuk semua produk (karena require tidak bisa pakai path dinamis)
+const productImage = require('@/assets/images/contributor/kokoCrunch.png');
 
 export const CardProduk = () => {
   return (
     <View style={styles.container}>
-      {productData.map(product => (
-        <View key={product.id} style={[styles.card, product.id > 1 && styles.marginTop]}>
-          <Text style={product.statusStyle(styles)}>{product.statusText}</Text>
+      {productsData.map(product => (
+        <View key={product.id} style={[styles.card, Number(product.id) > 1 && styles.marginTop]}>
+          <Text style={getStatusStyle(product.status, styles)}>{product.statusText}</Text>
           
           <View style={styles.cardContent}>
             <Image 
-              source={product.image} 
+              source={productImage} 
               style={styles.productImage} 
             />
             
@@ -101,13 +79,13 @@ const styles = StyleSheet.create({
   inCheckText: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#FF9800',
+    color: Colors.warning[40],
     padding: 16,
   },
   publishText: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#4CAF50',
+    color: Colors.primary,
     padding: 16,
   },
   cardContent: {
