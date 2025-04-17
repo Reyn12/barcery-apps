@@ -3,6 +3,7 @@ import { Stack, router } from 'expo-router';
 import { Colors } from '../../../constants/Colors';
 import { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Eye, EyeOff } from 'lucide-react-native';
 
 export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
@@ -16,21 +17,21 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Stack.Screen 
+      <Stack.Screen
         options={{
           headerShown: false,
-        }} 
+        }}
       />
-      
+
       <View style={styles.content}>
-        <Image 
+        <Image
           source={require('../../../assets/images/contributor/logoAuth.png')}
           style={styles.image}
           resizeMode="contain"
         />
-        
+
         <Text style={styles.title}>Login</Text>
-        
+
         <View style={styles.form}>
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Email</Text>
@@ -55,7 +56,7 @@ export default function LoginScreen() {
                 secureTextEntry={!showPassword}
               />
               <Pressable onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
-                <Text>👁</Text>
+                {showPassword ? <Eye size={20} color="#666" /> : <EyeOff size={20} color="#666" />}
               </Pressable>
             </View>
           </View>
