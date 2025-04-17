@@ -35,7 +35,7 @@ export function Header() {
 const styles = StyleSheet.create({
     container: {
         backgroundColor: Colors.primary,
-        paddingHorizontal: 16,
+        paddingHorizontal: 20,
     },
     safeArea: {
         gap: 24,
